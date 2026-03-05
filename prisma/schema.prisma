@@ -1,0 +1,143 @@
+// 三高家庭健康托管系统 - Prisma Schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// 用户账号
+model User {
+  id        String   @id @default(cuid())
+  email     String?  @unique
+  phone     String?  @unique
+  name      String?
+  password  String?
+  role      String   @default("MEMBER") // ADMIN | MANAGER | MEMBER
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  family          FamilyMember?
+  managerFamilies Family[]      @relation("ManagedBy")
+  notes           ManagerNote[]
+}
+
+// 家庭
+model Family {
+  id        String   @id @default(cuid())
+  name      String
+  code      String   @unique // 邀请码
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  managerId String?
+  manager   User?         @relation("ManagedBy", fields: [managerId], references: [id])
+  members   FamilyMember[]
+  tasks     Task[]
+  notes     ManagerNote[]
+}
+
+// 家庭成员
+model FamilyMember {
+  id            String   @id @default(cuid())
+  userId        String   @unique
+  familyId      String
+  nickname      String
+  role          String   @default("OTHER") // FATHER | MOTHER | CHILD | GRANDPARENT | OTHER
+  birthYear     Int?
+  gender        String?  // MALE | FEMALE
+  hasTripleHigh Boolean  @default(false)
+  createdAt     DateTime @default(now())
+
+  user    User           @relation(fields: [userId], references: [id])
+  family  Family         @relation(fields: [familyId], references: [id])
+  records HealthRecord[]
+  alerts  Alert[]
+}
+
+// 健康记录
+model HealthRecord {
+  id         String   @id @default(cuid())
+  memberId   String
+  type       String   // BLOOD_PRESSURE | GLUCOSE | WEIGHT | MOOD | BEHAVIOR
+  recordedAt DateTime @default(now())
+  createdAt  DateTime @default(now())
+
+  // 血压 (mmHg)
+  systolic  Int?
+  diastolic Int?
+  heartRate Int?
+
+  // 血糖 (mmol/L)
+  glucose     Float?
+  glucoseType String? // FASTING | POST_MEAL
+
+  // 体重
+  weight Float? // kg
+  bmi    Float?
+
+  // 情绪/行为
+  moodScore  Int?     // 1-5
+  sleptLate  Boolean?
+  hadDinner  Boolean?
+  exercised  Boolean?
+
+  note   String?
+  member FamilyMember @relation(fields: [memberId], references: [id])
+}
+
+// 风险预警
+model Alert {
+  id         String    @id @default(cuid())
+  memberId   String
+  type       String    // HIGH_BLOOD_PRESSURE | LOW_BLOOD_PRESSURE | HIGH_GLUCOSE | ...
+  level      String    // GREEN | YELLOW | RED
+  message    String
+  resolved   Boolean   @default(false)
+  createdAt  DateTime  @default(now())
+  resolvedAt DateTime?
+
+  member FamilyMember @relation(fields: [memberId], references: [id])
+}
+
+// 家庭任务
+model Task {
+  id          String    @id @default(cuid())
+  familyId    String
+  title       String
+  description String?
+  category    String    // FAMILY_DINNER | EXERCISE | COMPANIONSHIP | MEDICATION | CHECKUP | OTHER
+  dueDate     DateTime?
+  completed   Boolean   @default(false)
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+
+  family Family @relation(fields: [familyId], references: [id])
+}
+
+// 管理师笔记
+model ManagerNote {
+  id        String   @id @default(cuid())
+  familyId  String
+  authorId  String
+  content   String
+  createdAt DateTime @default(now())
+
+  family Family @relation(fields: [familyId], references: [id])
+  author User   @relation(fields: [authorId], references: [id])
+}
+
+// 短信验证码
+model OtpCode {
+  id        String   @id @default(cuid())
+  phone     String
+  code      String
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([phone])
+}
