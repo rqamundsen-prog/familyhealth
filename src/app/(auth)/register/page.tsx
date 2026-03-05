@@ -48,6 +48,12 @@ export default function RegisterPage() {
         return
       }
 
+      // 如果后端返回了验证码（短信未开通时），自动填入
+      if (data.code) {
+        setDevCode(data.code)
+        setCode(data.code)
+      }
+
       setCountdown(60)
       setStep('verify')
     } finally {
@@ -145,9 +151,17 @@ export default function RegisterPage() {
               </button>
 
               <h2 className="text-lg font-semibold text-gray-900 mb-1">输入验证码</h2>
-              <p className="text-sm text-gray-400 mb-6">
-                已发送到 {phone.slice(0, 3)}****{phone.slice(-4)}
-              </p>
+              {devCode ? (
+                <div className="bg-green-50 border border-green-200 rounded-lg px-3 py-2 mb-4">
+                  <p className="text-sm text-green-700">
+                    ✅ 验证码已自动填入，点击下方按钮即可完成注册
+                  </p>
+                </div>
+              ) : (
+                <p className="text-sm text-gray-400 mb-6">
+                  已发送到 {phone.slice(0, 3)}****{phone.slice(-4)}
+                </p>
+              )}
 
               <form onSubmit={handleVerify} className="space-y-4">
                 <div>

@@ -43,6 +43,11 @@ export default function LoginPage() {
       const data = await res.json()
       if (!res.ok) { setError(data.error); return }
 
+      // 如果后端返回了验证码（短信未开通时），自动填入
+      if (data.code) {
+        setCode(data.code)
+      }
+
       setCountdown(60)
       const timer = setInterval(() => {
         setCountdown(c => {

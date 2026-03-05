@@ -42,10 +42,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: result.error || '短信发送失败' }, { status: 500 })
   }
 
+  // 如果短信未启用，返回验证码给前端直接展示（方便用户注册）
+  const smsEnabled = process.env.SMS_ENABLED === 'true'
+
   return NextResponse.json({
     success: true,
-    message: process.env.NODE_ENV === 'development'
-      ? `验证码已打印到控制台（开发模式）`
-      : '验证码已发送，5分钟内有效',
+    message: smsEnabled
+      ? '验证码已发送，5分钟内有效'
+      : '验证码已生成',
+    ...(!smsEnabled && { code }),
   })
 }
