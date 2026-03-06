@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client'
-import { existsSync, copyFileSync } from 'fs'
+import { existsSync, copyFileSync, writeFileSync } from 'fs'
 import path from 'path'
 
 const isVercel = !!process.env.VERCEL
@@ -7,63 +7,58 @@ const TMP_DB = '/tmp/familyhealth.db'
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined
-  dbInitialized: boolean | undefined
+  dbReady: boolean | undefined
 }
 
-/**
- * 初始化数据库（Vercel 环境）
- * 优先从 GitHub 下载，失败则使用模板
- */
-async function initDb(): Promise<void> {
-  if (!isVercel || existsSync(TMP_DB)) return
+// 同步从 GitHub 下载数据库（使用 synchronous XMLHttpRequest 的替代方案）
+function syncDownloadFromGitHub(): boolean {
+  if (!process.env.GITHUB_TOKEN || !process.env.GITHUB_REPO) return false
   
-  // 尝试从 GitHub 下载
-  if (process.env.GITHUB_TOKEN) {
-    try {
-      const { downloadDbFromGitHub } = await import('./github-db-sync')
-      const downloaded = await downloadDbFromGitHub()
-      if (downloaded) return
-    } catch (e) {
-      console.error('GitHub download failed:', e)
+  const repo = process.env.GITHUB_REPO
+  const token = process.env.GITHUB_TOKEN
+  const url = `https://api.github.com/repos/${repo}/contents/data/familyhealth.db`
+  
+  try {
+    // 使用 child_process.execSync 同步下载
+    const { execSync } = require('child_process')
+    const result = execSync(
+      `curl -s -H "Authorization: Bearer ${token}" -H "Accept: application/vnd.github.v3+json" "${url}"`,
+      { timeout: 10000, encoding: 'utf8' }
+    )
+    const data = JSON.parse(result)
+    if (data.content && data.sha) {
+      const content = Buffer.from(data.content.replace(/\n/g, ''), 'base64')
+      writeFileSync(TMP_DB, content)
+      // 存储 SHA 供后续更新使用
+      writeFileSync('/tmp/familyhealth-sha.txt', data.sha)
+      console.log(`✅ DB synced from GitHub (${content.length} bytes)`)
+      return true
     }
+  } catch (e) {
+    console.error('GitHub sync failed:', e)
   }
-
-  // fallback: 从打包的模板数据库复制
-  const templateDb = path.join(process.cwd(), 'prisma', 'prod.db')
-  if (existsSync(templateDb)) {
-    try {
-      copyFileSync(templateDb, TMP_DB)
-      console.log('✅ Database copied from template to /tmp')
-    } catch (e) {
-      console.error('❌ Failed to copy database:', e)
-    }
-  } else {
-    console.error('❌ Template database not found at', templateDb)
-  }
+  return false
 }
 
-// 同步初始化（Vercel冷启动时尝试从GitHub下载）
-if (isVercel && !existsSync(TMP_DB) && !globalForPrisma.dbInitialized) {
-  // 先用模板确保有DB可用
-  const templateDb = path.join(process.cwd(), 'prisma', 'prod.db')
-  if (existsSync(templateDb)) {
-    try {
-      copyFileSync(templateDb, TMP_DB)
-      console.log('✅ Database copied from template (will async download from GitHub)')
-    } catch (e) {
-      console.error('❌ Failed to copy template:', e)
-    }
+// Vercel 冷启动：优先从 GitHub 下载，失败则用模板
+if (isVercel && !globalForPrisma.dbReady) {
+  let downloaded = false
+  if (!existsSync(TMP_DB)) {
+    downloaded = syncDownloadFromGitHub()
   }
   
-  // 异步从 GitHub 下载覆盖（下次请求生效）
-  if (process.env.GITHUB_TOKEN) {
-    import('./github-db-sync').then(mod => {
-      mod.downloadDbFromGitHub().then(ok => {
-        if (ok) console.log('✅ GitHub DB downloaded, will be used on next cold start or after reconnect')
-      })
-    }).catch(() => {})
+  if (!downloaded && !existsSync(TMP_DB)) {
+    const templateDb = path.join(process.cwd(), 'prisma', 'prod.db')
+    if (existsSync(templateDb)) {
+      try {
+        copyFileSync(templateDb, TMP_DB)
+        console.log('✅ DB copied from template')
+      } catch (e) {
+        console.error('❌ Failed to copy template:', e)
+      }
+    }
   }
-  globalForPrisma.dbInitialized = true
+  globalForPrisma.dbReady = true
 }
 
 const dbUrl = isVercel ? `file:${TMP_DB}` : (process.env.DATABASE_URL || 'file:./prisma/dev.db')
@@ -86,6 +81,6 @@ export async function syncDbAfterWrite(): Promise<void> {
     const { scheduleSyncToGitHub } = await import('./github-db-sync')
     scheduleSyncToGitHub()
   } catch (e) {
-    // 静默失败，不影响主流程
+    // 静默失败
   }
 }

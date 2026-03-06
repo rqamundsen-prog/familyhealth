@@ -17,7 +17,17 @@ const TMP_DB = '/tmp/familyhealth.db'
 
 const API_BASE = `https://api.github.com/repos/${GITHUB_REPO}/contents/${DB_PATH_IN_REPO}`
 
-let currentSha: string | null = null
+import { existsSync as shaFileExists, readFileSync as readShaFile } from 'fs'
+
+// 尝试从冷启动时保存的 SHA 文件读取
+let currentSha: string | null = (() => {
+  try {
+    if (shaFileExists('/tmp/familyhealth-sha.txt')) {
+      return readShaFile('/tmp/familyhealth-sha.txt', 'utf8').trim()
+    }
+  } catch {}
+  return null
+})()
 let syncTimer: NodeJS.Timeout | null = null
 let isSyncing = false
 
