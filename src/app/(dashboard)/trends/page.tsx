@@ -10,7 +10,7 @@ export default async function TrendsPage() {
   if (!session) redirect('/login')
 
   const user = await prisma.user.findUnique({
-    where: { email: session.user?.email! },
+    where: { id: (session.user as any).id },
     include: {
       family: {
         include: {

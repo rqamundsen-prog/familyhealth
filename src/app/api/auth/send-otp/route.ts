@@ -1,4 +1,4 @@
-import { prisma } from '@/lib/db'
+import { prisma, syncDbAfterWrite } from '@/lib/db'
 import { sendSms, generateOtpCode } from '@/lib/sms'
 import { NextRequest, NextResponse } from 'next/server'
 
@@ -34,6 +34,7 @@ export async function POST(req: NextRequest) {
   await prisma.otpCode.create({
     data: { phone, code, expiresAt },
   })
+  syncDbAfterWrite()
 
   // 发送短信
   const result = await sendSms(phone, code)

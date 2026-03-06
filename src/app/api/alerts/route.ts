@@ -8,7 +8,7 @@ export async function GET() {
   if (!session) return NextResponse.json({ error: '未授权' }, { status: 401 })
 
   const user = await prisma.user.findUnique({
-    where: { email: session.user?.email! },
+    where: { id: (session.user as any).id },
     include: { family: true },
   })
 

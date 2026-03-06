@@ -12,8 +12,13 @@ export default async function DashboardPage() {
   const session = await getServerSession(authOptions)
   if (!session) redirect('/login')
 
+  // 支持手机号和邮箱登录的用户：优先用 id，fallback 用 email
+  const sessionUser = session.user as { id?: string; email?: string | null }
+  const userId = sessionUser.id
+  const userEmail = sessionUser.email
+
   const user = await prisma.user.findUnique({
-    where: { email: session.user?.email! },
+    where: userId ? { id: userId } : { email: userEmail! },
     include: {
       family: {
         include: {

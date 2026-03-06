@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
 
   // 找到当前用户的家庭成员身份
   const user = await prisma.user.findUnique({
-    where: { email: session.user?.email! },
+    where: { id: (session.user as any).id },
     include: { family: true },
   })
 

@@ -1,6 +1,6 @@
 import { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
-import { prisma } from '@/lib/db'
+import { prisma, syncDbAfterWrite } from '@/lib/db'
 
 export const authOptions: NextAuthOptions = {
   session: { strategy: 'jwt' },
@@ -74,6 +74,8 @@ export const authOptions: NextAuthOptions = {
               role: 'MEMBER',
             },
           })
+          // 新用户注册，同步数据库到 GitHub
+          syncDbAfterWrite()
         }
 
         return {

@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
   const familyId = searchParams.get('familyId')
 
   const user = await prisma.user.findUnique({
-    where: { email: session.user?.email! },
+    where: { id: (session.user as any).id },
     include: { family: true },
   })
 
@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
   const body = await req.json()
 
   const user = await prisma.user.findUnique({
-    where: { email: session.user?.email! },
+    where: { id: (session.user as any).id },
     include: { family: true },
   })
 
