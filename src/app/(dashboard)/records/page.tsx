@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { Activity, Heart, Weight, Moon, CheckSquare } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -16,7 +16,6 @@ const tabs: { type: RecordType; label: string; icon: React.ElementType }[] = [
 
 export default function RecordsPage() {
   const router = useRouter()
-  const searchParams = useSearchParams()
   const [activeType, setActiveType] = useState<RecordType>('BLOOD_PRESSURE')
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
@@ -48,17 +47,19 @@ export default function RecordsPage() {
   }), [])
 
   useEffect(() => {
-    const type = searchParams.get('type')
+    if (typeof window === 'undefined') return
+    const params = new URLSearchParams(window.location.search)
+    const type = params.get('type')
     if (type === 'BEHAVIOR' || type === 'BLOOD_PRESSURE' || type === 'GLUCOSE' || type === 'WEIGHT') {
       setActiveType(type)
     }
 
-    const tpl = searchParams.get('template') as 'anxiety' | 'sleep' | 'work' | null
+    const tpl = params.get('template') as 'anxiety' | 'sleep' | 'work' | null
     if (tpl && behaviorTemplates[tpl]) {
       setActiveType('BEHAVIOR')
       setNote(behaviorTemplates[tpl])
     }
-  }, [searchParams, behaviorTemplates])
+  }, [behaviorTemplates])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
