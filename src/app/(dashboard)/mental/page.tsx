@@ -4,6 +4,7 @@ import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { Brain, Moon, Briefcase, Wind, ArrowRight } from 'lucide-react'
+import MentalPlannerClient from './MentalPlannerClient'
 
 function planByState(avgMood: number, lateSleepDays: number) {
   if (avgMood <= 2.6 || lateSleepDays >= 4) {
@@ -98,6 +99,8 @@ export default async function MentalSupportPage() {
         </h1>
         <p className="text-gray-500 mt-1">先解决高频场景：焦虑、睡眠、职场压力。</p>
       </div>
+
+      <MentalPlannerClient />
 
       <div className="grid grid-cols-3 gap-4 mb-6">
         <div className="bg-white rounded-xl border border-gray-200 p-4">
