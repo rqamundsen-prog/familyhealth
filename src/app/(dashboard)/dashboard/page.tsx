@@ -7,6 +7,7 @@ import { format } from 'date-fns'
 import { zhCN } from 'date-fns/locale'
 import { AlertTriangle, Heart, Activity, Weight, TrendingUp, TrendingDown, Minus, CheckCircle, Bell } from 'lucide-react'
 import Link from 'next/link'
+import OnboardingCard from './OnboardingCard'
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions)
@@ -48,11 +49,7 @@ export default async function DashboardPage() {
   })
 
   if (!user?.family?.family) {
-    return (
-      <div className="p-8 text-center">
-        <p className="text-gray-500">您还未加入家庭，请联系管理师</p>
-      </div>
-    )
+    return <OnboardingCard />
   }
 
   const family = user.family.family
