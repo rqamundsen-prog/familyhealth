@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useEffect, useMemo, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Activity, Heart, Weight, Moon, CheckSquare } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -16,6 +16,7 @@ const tabs: { type: RecordType; label: string; icon: React.ElementType }[] = [
 
 export default function RecordsPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [activeType, setActiveType] = useState<RecordType>('BLOOD_PRESSURE')
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
@@ -39,6 +40,25 @@ export default function RecordsPage() {
   const [exercised, setExercised] = useState(false)
 
   const [note, setNote] = useState('')
+
+  const behaviorTemplates = useMemo(() => ({
+    anxiety: '焦虑急救：现在最困扰我的想法是____，做完练习后我感觉____。',
+    sleep: '睡前降压：今晚我准备在____点放下手机，睡前做____分钟放松。',
+    work: '职场复位：今天压力来源是____，我准备先完成____这个最小动作。',
+  }), [])
+
+  useEffect(() => {
+    const type = searchParams.get('type')
+    if (type === 'BEHAVIOR' || type === 'BLOOD_PRESSURE' || type === 'GLUCOSE' || type === 'WEIGHT') {
+      setActiveType(type)
+    }
+
+    const tpl = searchParams.get('template') as 'anxiety' | 'sleep' | 'work' | null
+    if (tpl && behaviorTemplates[tpl]) {
+      setActiveType('BEHAVIOR')
+      setNote(behaviorTemplates[tpl])
+    }
+  }, [searchParams, behaviorTemplates])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -291,6 +311,14 @@ export default function RecordsPage() {
                     <span className="text-sm text-gray-700">{item.label}</span>
                   </label>
                 ))}
+              </div>
+
+              <div className="rounded-lg border border-blue-200 bg-blue-50 p-3 text-xs text-blue-700">
+                快捷入口：
+                <span className="mx-1">焦虑急救（5分钟）</span>
+                <span className="mx-1">睡前降压（10分钟）</span>
+                <span className="mx-1">职场复位（7分钟）</span>
+                <span className="block mt-1 text-blue-600">先记录今天状态，再执行一个最小动作，持续7天看趋势。</span>
               </div>
             </div>
           )}

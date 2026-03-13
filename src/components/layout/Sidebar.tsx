@@ -12,11 +12,13 @@ import {
   Users,
   LogOut,
   Heart,
+  Brain,
 } from 'lucide-react'
 
 const navItems = [
   { href: '/dashboard', label: '健康仪表盘', icon: LayoutDashboard },
   { href: '/records', label: '数据录入', icon: ClipboardList },
+  { href: '/mental', label: '心理支持', icon: Brain },
   { href: '/trends', label: '趋势分析', icon: TrendingUp },
   { href: '/alerts', label: '风险预警', icon: AlertTriangle },
   { href: '/tasks', label: '家庭任务', icon: CheckSquare },
