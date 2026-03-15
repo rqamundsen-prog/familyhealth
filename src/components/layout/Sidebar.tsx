@@ -18,7 +18,7 @@ import {
 const navItems = [
   { href: '/dashboard', label: '健康仪表盘', icon: LayoutDashboard },
   { href: '/records', label: '数据录入', icon: ClipboardList },
-  { href: '/mental', label: '心理支持', icon: Brain },
+  { href: '/mental', label: '我的情绪', icon: Brain }
   { href: '/trends', label: '趋势分析', icon: TrendingUp },
   { href: '/alerts', label: '风险预警', icon: AlertTriangle },
   { href: '/tasks', label: '家庭任务', icon: CheckSquare },
@@ -39,8 +39,8 @@ export function Sidebar() {
           <Heart className="h-5 w-5 text-white" />
         </div>
         <div>
-          <p className="text-sm font-bold text-gray-900">家健</p>
-          <p className="text-xs text-gray-500">家庭健康托管</p>
+          <p className="text-sm font-bold text-gray-900">我的情绪</p>
+          <p className="text-xs text-gray-500">Within · 私密情绪照护</p>
         </div>
       </div>
 

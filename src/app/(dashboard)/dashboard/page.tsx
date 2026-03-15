@@ -187,17 +187,17 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      {/* 心理支持入口 */}
+      {/* 我的情绪入口 */}
       <div className="mb-8 rounded-xl border border-purple-200 bg-purple-50 p-5 flex items-center justify-between">
         <div>
-          <h2 className="text-base font-semibold text-purple-900">心理支持已上线：焦虑 / 睡眠 / 职场压力</h2>
-          <p className="text-sm text-purple-700 mt-1">先做3-10分钟小干预，再记录情绪与行为，连续7天看改善。</p>
+          <h2 className="text-base font-semibold text-purple-900">我的情绪（Within）已上线：焦虑 / 睡眠 / 职场压力</h2>
+          <p className="text-sm text-purple-700 mt-1">先做3-10分钟小照护，再记录情绪与行为，连续7天看改善。</p>
         </div>
         <Link
           href="/mental"
           className="inline-flex items-center gap-2 bg-purple-600 text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors"
         >
-          进入心理支持
+          进入我的情绪
         </Link>
       </div>
 

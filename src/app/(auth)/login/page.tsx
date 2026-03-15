@@ -88,13 +88,14 @@ export default function LoginPage() {
           <div className="inline-flex items-center justify-center h-16 w-16 rounded-2xl bg-blue-600 mb-4">
             <Heart className="h-9 w-9 text-white" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">家健</h1>
-          <p className="text-gray-500 mt-1">家庭慢病行为托管系统</p>
+          <h1 className="text-2xl font-bold text-gray-900">我的情绪</h1>
+          <p className="text-gray-500 mt-1">Within · 你的私密情绪空间</p>
         </div>
 
         {/* 登录卡片 */}
         <div className="bg-white rounded-2xl shadow-lg p-8">
-          <h2 className="text-lg font-semibold text-gray-900 mb-6">登录账号</h2>
+          <h2 className="text-lg font-semibold text-gray-900 mb-3">登录账号</h2>
+          <p className="text-xs text-gray-500 mb-6 rounded-lg bg-blue-50 border border-blue-100 px-3 py-2">默认仅自己可见，你的数据由你掌控。</p>
 
           {/* 登录方式切换 */}
           <div className="flex gap-1 bg-gray-100 rounded-xl p-1 mb-6">

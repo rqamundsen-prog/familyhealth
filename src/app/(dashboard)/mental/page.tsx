@@ -129,9 +129,9 @@ export default async function MentalSupportPage() {
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
           <Brain className="text-purple-600" size={24} />
-          心理支持中心
+          我的情绪（Within）
         </h1>
-        <p className="text-gray-500 mt-1">从记录升级为干预：先分诊，再执行，再复盘。</p>
+        <p className="text-gray-500 mt-1">从记录到照护：先看见情绪，再执行小行动，最后复盘趋势。</p>
       </div>
 
       <MentalPlannerClient />

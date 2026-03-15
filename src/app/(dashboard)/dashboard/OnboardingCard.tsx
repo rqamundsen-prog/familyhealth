@@ -57,8 +57,8 @@ export default function OnboardingCard() {
   return (
     <div className="max-w-3xl mx-auto p-8">
       <div className="bg-white rounded-xl border border-gray-200 p-6">
-        <h1 className="text-xl font-bold text-gray-900 mb-2">欢迎使用家健</h1>
-        <p className="text-sm text-gray-500 mb-6">你还未加入家庭。先完成下面任意一步，就能开始记录和查看健康数据。</p>
+        <h1 className="text-xl font-bold text-gray-900 mb-2">欢迎来到我的情绪（Within）</h1>
+        <p className="text-sm text-gray-500 mb-6">你还未加入家庭。先完成下面任意一步，就能开始记录、理解并照护情绪数据。</p>
 
         <div className="grid md:grid-cols-2 gap-4">
           <div className="rounded-lg border border-gray-100 p-4">
