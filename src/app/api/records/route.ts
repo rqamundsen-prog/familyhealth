@@ -1,4 +1,4 @@
-import { prisma } from '@/lib/db'
+import { prisma, syncDbAfterWrite } from '@/lib/db'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import { NextRequest, NextResponse } from 'next/server'
@@ -124,5 +124,6 @@ export async function POST(req: NextRequest) {
     }
   }
 
+  await syncDbAfterWrite()
   return NextResponse.json(record)
 }

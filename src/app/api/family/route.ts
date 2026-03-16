@@ -1,4 +1,4 @@
-import { prisma } from '@/lib/db'
+import { prisma, syncDbAfterWrite } from '@/lib/db'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import { NextRequest, NextResponse } from 'next/server'
@@ -51,6 +51,7 @@ export async function POST(req: NextRequest) {
         role: 'OTHER',
       },
     })
+    await syncDbAfterWrite()
 
     return NextResponse.json({ success: true, mode: 'create', familyCode: family.code })
   }
@@ -70,6 +71,7 @@ export async function POST(req: NextRequest) {
         role: 'OTHER',
       },
     })
+    await syncDbAfterWrite()
 
     return NextResponse.json({ success: true, mode: 'join' })
   }
