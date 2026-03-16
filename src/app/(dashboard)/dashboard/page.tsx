@@ -14,12 +14,19 @@ export default async function DashboardPage() {
   if (!session) redirect('/login')
 
   // 支持手机号和邮箱登录的用户：优先用 id，fallback 用 email
-  const sessionUser = session.user as { id?: string; email?: string | null }
+  const sessionUser = session.user as { id?: string; email?: string | null; phone?: string | null }
   const userId = sessionUser.id
   const userEmail = sessionUser.email
+  const userPhone = sessionUser.phone
 
-  const user = await prisma.user.findUnique({
-    where: userId ? { id: userId } : { email: userEmail! },
+  const user = await prisma.user.findFirst({
+    where: {
+      OR: [
+        userId ? { id: userId } : undefined,
+        userEmail ? { email: userEmail } : undefined,
+        userPhone ? { phone: userPhone } : undefined,
+      ].filter(Boolean) as any,
+    },
     include: {
       family: {
         include: {

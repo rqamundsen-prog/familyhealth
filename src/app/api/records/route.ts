@@ -37,8 +37,15 @@ export async function POST(req: NextRequest) {
   const body = await req.json()
 
   // 找到当前用户的家庭成员身份
-  const user = await prisma.user.findUnique({
-    where: { id: (session.user as any).id },
+  const s = session.user as { id?: string; email?: string | null; phone?: string | null }
+  const user = await prisma.user.findFirst({
+    where: {
+      OR: [
+        s.id ? { id: s.id } : undefined,
+        s.email ? { email: s.email } : undefined,
+        s.phone ? { phone: s.phone } : undefined,
+      ].filter(Boolean) as any,
+    },
     include: { family: true },
   })
 

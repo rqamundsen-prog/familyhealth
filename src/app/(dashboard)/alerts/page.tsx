@@ -11,8 +11,15 @@ export default async function AlertsPage() {
   const session = await getServerSession(authOptions)
   if (!session) redirect('/login')
 
-  const user = await prisma.user.findUnique({
-    where: { id: (session.user as any).id },
+  const s = session.user as { id?: string; email?: string | null; phone?: string | null }
+  const user = await prisma.user.findFirst({
+    where: {
+      OR: [
+        s.id ? { id: s.id } : undefined,
+        s.email ? { email: s.email } : undefined,
+        s.phone ? { phone: s.phone } : undefined,
+      ].filter(Boolean) as any,
+    },
     include: {
       family: {
         include: {

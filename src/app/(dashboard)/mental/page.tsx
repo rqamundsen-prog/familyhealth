@@ -39,9 +39,15 @@ export default async function MentalSupportPage() {
   const session = await getServerSession(authOptions)
   if (!session) redirect('/login')
 
-  const sessionUser = session.user as { id?: string; email?: string | null }
-  const user = await prisma.user.findUnique({
-    where: sessionUser.id ? { id: sessionUser.id } : { email: sessionUser.email! },
+  const sessionUser = session.user as { id?: string; email?: string | null; phone?: string | null }
+  const user = await prisma.user.findFirst({
+    where: {
+      OR: [
+        sessionUser.id ? { id: sessionUser.id } : undefined,
+        sessionUser.email ? { email: sessionUser.email } : undefined,
+        sessionUser.phone ? { phone: sessionUser.phone } : undefined,
+      ].filter(Boolean) as any,
+    },
     include: { family: true },
   })
 
