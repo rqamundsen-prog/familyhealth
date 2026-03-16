@@ -31,9 +31,10 @@ export async function POST(req: NextRequest) {
     include: { family: true },
   })
 
-  const ensuredUser = user || (userPhone || userEmail
+  const ensuredUser = user || ((userPhone || userEmail || userId)
     ? await prisma.user.create({
         data: {
+          id: userId || undefined,
           phone: userPhone || undefined,
           email: userEmail || undefined,
           name: (sessionUser as any).name || (userPhone ? `用户${String(userPhone).slice(-4)}` : '新用户'),
