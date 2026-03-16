@@ -31,11 +31,23 @@ export async function POST(req: NextRequest) {
     include: { family: true },
   })
 
-  if (!user) return NextResponse.json({ error: '用户不存在' }, { status: 404 })
-  if (user.family) return NextResponse.json({ error: '您已加入家庭' }, { status: 400 })
+  const ensuredUser = user || (userPhone || userEmail
+    ? await prisma.user.create({
+        data: {
+          phone: userPhone || undefined,
+          email: userEmail || undefined,
+          name: (sessionUser as any).name || (userPhone ? `用户${String(userPhone).slice(-4)}` : '新用户'),
+          role: 'MEMBER',
+        },
+        include: { family: true },
+      })
+    : null)
+
+  if (!ensuredUser) return NextResponse.json({ error: '用户不存在' }, { status: 404 })
+  if (ensuredUser.family) return NextResponse.json({ error: '您已加入家庭' }, { status: 400 })
 
   if (action === 'create') {
-    const familyName = (body?.familyName || `${user.name || '我的'}家庭`).toString().slice(0, 24)
+    const familyName = (body?.familyName || `${ensuredUser.name || '我的'}家庭`).toString().slice(0, 24)
 
     let code = genCode()
     // 简单重试避免邀请码冲突
@@ -54,9 +66,9 @@ export async function POST(req: NextRequest) {
 
     await prisma.familyMember.create({
       data: {
-        userId: user.id,
+        userId: ensuredUser.id,
         familyId: family.id,
-        nickname: user.name || '我',
+        nickname: ensuredUser.name || '我',
         role: 'OTHER',
       },
     })
@@ -74,9 +86,9 @@ export async function POST(req: NextRequest) {
 
     await prisma.familyMember.create({
       data: {
-        userId: user.id,
+        userId: ensuredUser.id,
         familyId: family.id,
-        nickname: user.name || '我',
+        nickname: ensuredUser.name || '我',
         role: 'OTHER',
       },
     })
