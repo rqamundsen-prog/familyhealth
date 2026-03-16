@@ -22,12 +22,19 @@ export default function OnboardingCard() {
       })
       const data = await res.json()
       if (!res.ok) {
+        if ((data.error || '').includes('已加入家庭')) {
+          setMsg('你已在空间中，正在为你跳转...')
+          router.replace('/dashboard')
+          router.refresh()
+          return
+        }
         setMsg(data.error || '开启失败')
         return
       }
       setCreatedCode(data.familyCode || '')
-      setMsg('已为你开启个人空间（默认仅自己可见）')
-      setTimeout(() => router.refresh(), 500)
+      setMsg('已为你开启个人空间（默认仅自己可见），正在进入首页...')
+      router.replace('/dashboard')
+      router.refresh()
     } finally {
       setLoading('none')
     }
@@ -44,12 +51,19 @@ export default function OnboardingCard() {
       })
       const data = await res.json()
       if (!res.ok) {
+        if ((data.error || '').includes('已加入家庭')) {
+          setMsg('你已在空间中，正在为你跳转...')
+          router.replace('/dashboard')
+          router.refresh()
+          return
+        }
         setMsg(data.error || '创建失败')
         return
       }
       setCreatedCode(data.familyCode || '')
-      setMsg('创建成功，已自动加入家庭')
-      setTimeout(() => router.refresh(), 500)
+      setMsg('创建成功，正在进入首页...')
+      router.replace('/dashboard')
+      router.refresh()
     } finally {
       setLoading('none')
     }
@@ -66,11 +80,18 @@ export default function OnboardingCard() {
       })
       const data = await res.json()
       if (!res.ok) {
+        if ((data.error || '').includes('已加入家庭')) {
+          setMsg('你已在空间中，正在为你跳转...')
+          router.replace('/dashboard')
+          router.refresh()
+          return
+        }
         setMsg(data.error || '加入失败')
         return
       }
-      setMsg('加入成功')
-      setTimeout(() => router.refresh(), 500)
+      setMsg('加入成功，正在进入首页...')
+      router.replace('/dashboard')
+      router.refresh()
     } finally {
       setLoading('none')
     }

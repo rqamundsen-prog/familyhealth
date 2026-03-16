@@ -46,7 +46,15 @@ export default async function MentalSupportPage() {
   })
 
   if (!user?.family) {
-    return <div className="p-8 text-gray-500">未找到家庭成员信息</div>
+    return (
+      <div className="p-8 max-w-2xl mx-auto">
+        <div className="bg-white border border-gray-200 rounded-xl p-6 text-center">
+          <p className="text-gray-700 font-medium">你还没有开启个人空间</p>
+          <p className="text-sm text-gray-500 mt-1">先回到首页点「开始我的情绪」，再来使用照护计划。</p>
+          <Link href="/dashboard" className="inline-flex mt-4 h-9 items-center px-4 rounded bg-blue-600 text-white text-sm">回到首页开启</Link>
+        </div>
+      </div>
+    )
   }
 
   const days14Ago = new Date()

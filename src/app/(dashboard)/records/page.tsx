@@ -8,15 +8,15 @@ import { cn } from '@/lib/utils'
 type RecordType = 'BLOOD_PRESSURE' | 'GLUCOSE' | 'WEIGHT' | 'BEHAVIOR'
 
 const tabs: { type: RecordType; label: string; icon: React.ElementType }[] = [
+  { type: 'BEHAVIOR', label: '行为', icon: CheckSquare },
   { type: 'BLOOD_PRESSURE', label: '血压', icon: Activity },
   { type: 'GLUCOSE', label: '血糖', icon: Heart },
   { type: 'WEIGHT', label: '体重', icon: Weight },
-  { type: 'BEHAVIOR', label: '行为', icon: CheckSquare },
 ]
 
 export default function RecordsPage() {
   const router = useRouter()
-  const [activeType, setActiveType] = useState<RecordType>('BLOOD_PRESSURE')
+  const [activeType, setActiveType] = useState<RecordType>('BEHAVIOR')
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
 
@@ -338,8 +338,24 @@ export default function RecordsPage() {
 
           {/* 提交 */}
           {success && (
-            <div className="bg-green-50 border border-green-200 text-green-700 text-sm px-4 py-3 rounded-lg">
-              ✓ 数据录入成功！已触发自动风险检测。
+            <div className="bg-green-50 border border-green-200 text-green-700 text-sm px-4 py-3 rounded-lg space-y-2">
+              <p>✓ 数据录入成功！已触发自动风险检测。</p>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => router.push('/records/history')}
+                  className="h-8 px-3 rounded bg-white border border-green-300 text-green-700 text-xs hover:bg-green-100"
+                >
+                  查看我的记录
+                </button>
+                <button
+                  type="button"
+                  onClick={() => router.push('/trends')}
+                  className="h-8 px-3 rounded bg-white border border-green-300 text-green-700 text-xs hover:bg-green-100"
+                >
+                  查看趋势
+                </button>
+              </div>
             </div>
           )}
 
